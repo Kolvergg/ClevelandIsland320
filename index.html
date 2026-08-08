@@ -93,7 +93,18 @@ body {
     from { opacity: 1; filter: saturate(1); }
     to { opacity: 0; filter: saturate(.96); }
 }
+/* ===== Slide In Left Animation ===== */
+.screen.entering-slide-left {
+    position: relative;
+    z-index: 2;
+    /* Starts off-screen to the right, slides to 0 */
+    animation: screenSlideInLeft 0.35s cubic-bezier(.2,.8,.2,1) forwards;
+}
 
+@keyframes screenSlideInLeft {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
 /* Locks scroll while the landing screen OR the verify screen is active */
 body.lock-scroll, html.lock-scroll {
     overflow: hidden;
@@ -153,7 +164,7 @@ body.lock-scroll, html.lock-scroll {
 .splash-wrap .loader-spinner {
     position: absolute;
     top: 50%;
-    left: 45%;
+    left: 46%;
     transform: translate(-50%, -50%);
 }
 @keyframes spin {
@@ -906,28 +917,28 @@ setTimeout(function () {
         screen.style.width = '';
         screen.style.zIndex = '';
     }
-
-    function showLoaderThen(targetScreenName, callback) {
-        var current = app.querySelector('.screen.active');
-        var loader = document.getElementById('screen-loader');
-        
-        // Instantly hide current screen
-        if (current) current.classList.remove('active', 'entering');
-        
-        // Show the loader and lock the screen
-        loader.classList.add('active');
-        setLock(true);
-        
-        // Wait exactly 0.5 seconds (500ms), then proceed
-        setTimeout(function() {
-            loader.classList.remove('active');
-            if (callback) {
-                callback();
-            } else {
-                switchScreen(targetScreenName);
-            }
-        }, 500);
-    }
+function showLoaderThen(targetScreenName, callback) {
+    var current = app.querySelector('.screen.active');
+    var loader = document.getElementById('screen-loader');
+    
+    // Instantly hide current screen so it's ready behind the loader
+    if (current) current.classList.remove('active', 'entering', 'entering-slide-left');
+    
+    // Show the loader and lock the screen
+    loader.classList.add('active');
+    setLock(true);
+    
+    // Wait exactly 0.5 seconds (500ms), then proceed
+    setTimeout(function() {
+        loader.classList.remove('active');
+        if (callback) {
+            callback();
+        } else {
+            // Notice the 'true' here — this tells switchScreen to slide!
+            switchScreen(targetScreenName, true);
+        }
+    }, 500);
+}
 
     function switchScreen(name) {
         var current = app.querySelector('.screen.active');
