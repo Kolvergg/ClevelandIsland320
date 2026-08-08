@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#F7F9F7" id="theme-color-meta">
 <!-- Custom Home Screen icon — see note in chat about image requirements
      and the need to re-add to Home Screen once this is uploaded. -->
-<link rel="apple-touch-icon" href="vicroads.png">
+<link rel="apple-touch-icon" href="">
 <title>View details</title>
 <style>
 
@@ -63,26 +63,23 @@ body {
 .screen { display: none; }
 .screen.active { display: block; }
 
-
 /* Fixed colour layer for the iPhone safe-area / Dynamic Island region.
    It is not part of layout, so it will not move your photos, headers, buttons,
    segmented control, or invisible tap areas. */
 :root {
     --statusbar-color: #F7F9F7;
+    --statusbar-height: 59px;
 }
-
-html, body {
-    background-color: var(--statusbar-color);
-}
-
 .status-bar-fill {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: env(safe-area-inset-top);
-    background-color: var(--statusbar-color);
-    z-index: 9999;
+    height: max(env(safe-area-inset-top), var(--statusbar-height));
+    background-color: var(--statusbar-color, #FFFFFF);
+    z-index: 2147483647;
     pointer-events: none;
     transition: background-color 140ms ease;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 /* Lightweight fade used when switching into permit/identity/age/verify */
 .screen.entering {
@@ -614,7 +611,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-landing (was index.html) ===== -->
-  <div class="screen" id="screen-landing" data-statusbar-color="#ffffff">
+  <div class="screen" id="screen-landing" data-statusbar-color="#eef2f3">
     <div class="image-container">
         <img src="idjameshp.png" alt="">
         <a href="#" class="invisible-button" data-enter="permit"></a>
@@ -742,17 +739,15 @@ preloadImages();
 setTimeout(function () {
     var passcodeScreen = document.getElementById('screen-passcode');
     var statusColor = passcodeScreen.getAttribute('data-statusbar-color') || '#ffffff';
+    var statusFill = document.querySelector('.status-bar-fill');
+    var themeColorMeta = document.getElementById('theme-color-meta');
+
+    document.documentElement.style.setProperty('--statusbar-color', statusColor);
+    if (statusFill) statusFill.style.backgroundColor = statusColor;
+    if (themeColorMeta) themeColorMeta.setAttribute('content', statusColor);
 
     document.getElementById('screen-splash').classList.remove('active');
     passcodeScreen.classList.add('active');
-
-    document.documentElement.style.setProperty('--statusbar-color', statusColor);
-    document.body.style.backgroundColor = statusColor;
-
-    var themeColorMeta = document.getElementById('theme-color-meta');
-    if (themeColorMeta) {
-        themeColorMeta.setAttribute('content', statusColor);
-    }
 }, 800);
      
 (function () {
@@ -764,10 +759,7 @@ setTimeout(function () {
         document.getElementById('screen-splash').classList.remove('active');
         var passcodeScreen = document.getElementById('screen-passcode');
         passcodeScreen.classList.add('active');
-        document.documentElement.style.setProperty(
-            '--statusbar-color',
-            passcodeScreen.getAttribute('data-statusbar-color') || '#ffffff'
-        );
+        setStatusBarColorForScreen(passcodeScreen);
     }, 1000);
     var verifyTimerInterval = null;
     var segmentedOverlay = document.querySelector('.segmented-overlay');
@@ -780,18 +772,24 @@ setTimeout(function () {
         age: 'Age'
     };
     var screenFadeDuration = 280;
-         function setStatusBarColorForScreen(screen) {
-        if (!screen) return;
 
-        var statusColor = screen.getAttribute('data-statusbar-color') || '#ffffff';
-
+    function setStatusBarColor(statusColor) {
         document.documentElement.style.setProperty('--statusbar-color', statusColor);
-        document.body.style.backgroundColor = statusColor;
+
+        var statusFill = document.querySelector('.status-bar-fill');
+        if (statusFill) {
+            statusFill.style.backgroundColor = statusColor;
+        }
 
         var themeColorMeta = document.getElementById('theme-color-meta');
         if (themeColorMeta) {
             themeColorMeta.setAttribute('content', statusColor);
         }
+    }
+
+    function setStatusBarColorForScreen(screen) {
+        if (!screen) return;
+        setStatusBarColor(screen.getAttribute('data-statusbar-color') || '#ffffff');
     }
 
     setStatusBarColorForScreen(app.querySelector('.screen.active'));
@@ -967,6 +965,7 @@ function showLoaderThen(targetScreenName, callback) {
     if (current) current.classList.remove('active', 'entering', 'entering-slide-left');
     
     // Show the loader and lock the screen
+    setStatusBarColor('#F7F9F7');
     loader.classList.add('active');
     setLock(true);
     
@@ -985,7 +984,7 @@ function switchScreen(name) {
     var next = document.getElementById('screen-' + name);
     if (!next || next === current) return;
 
-             setStatusBarColorForScreen(next);
+    setStatusBarColorForScreen(next);
 
     var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
 
