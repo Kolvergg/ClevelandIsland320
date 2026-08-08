@@ -928,26 +928,19 @@ function showLoaderThen(targetScreenName, callback) {
     loader.classList.add('active');
     setLock(true);
     
-    // Wait 500ms, then proceed
     setTimeout(function() {
         loader.classList.remove('active');
         if (callback) {
             callback();
         } else {
-            // FIX: Only slide in if we are targeting a main page (like permit, age, etc.)
-            // This prevents the Home Screen from sliding in from the passcode screen.
-            var shouldSlide = false;
-            if (typeof isSegmentTarget === 'function' && isSegmentTarget(targetScreenName)) {
-                shouldSlide = true;
-            } else if (targetScreenName === 'permit') {
-                shouldSlide = true;
-            }
+            // THE FIX: If the target is 'home' (or 'passcode'), use normal fade (false).
+            // If it's going ANYWHERE else (like your main pages), trigger the slide (true).
+            var shouldSlide = (targetScreenName !== 'home' && targetScreenName !== 'passcode');
             
             switchScreen(targetScreenName, shouldSlide);
         }
     }, 500);
 }
-
    // Add 'slideIn' as the second parameter
 function switchScreen(name, slideIn) {
     var current = app.querySelector('.screen.active');
@@ -967,12 +960,12 @@ function switchScreen(name, slideIn) {
 
     if (name === 'landing') resetLanding();
 
+    // The Slide Logic
     if (slideIn) {
         next.classList.add('active', 'entering-slide-left');
-        // MATCH THE CSS: Increased from 350ms to 600ms to allow the slower slide to finish
         setTimeout(function () { next.classList.remove('entering-slide-left'); }, 600); 
     } else {
-        // Default fade animation for standard navigation (like Passcode -> Home)
+        // Normal Fade Logic
         next.classList.add('active', 'entering');
         setTimeout(function () { next.classList.remove('entering'); }, screenFadeDuration);
     }
