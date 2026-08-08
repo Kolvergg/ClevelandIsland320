@@ -69,11 +69,11 @@ body {
     position: fixed;
     top: 0; left: 0; right: 0;
     height: env(safe-area-inset-top);
-    background: #FFFFFF; /* TEMP diagnostic color — will be set back to white */
+    background: var(--statusbar-color, #FFFFFF);
     z-index: 9999;
     pointer-events: none;
+    transition: background-color 140ms ease;
 }
-
 /* Lightweight fade used when switching into permit/identity/age/verify */
 .screen.entering {
     position: relative;
@@ -546,7 +546,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-passcode (new front gate, shown first) ===== -->
-  <div class="screen active" id="screen-splash">
+  <div class="screen active" id="screen-splash" data-statusbar-color="#F7F9F7">
     <div class="splash-wrap">
         <img src="idsplash.png" alt="" class="splash-image">
         <div class="loader-spinner"></div>
@@ -554,7 +554,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-passcode (new front gate, now shown after splash) ===== -->
-  <div class="screen" id="screen-passcode">
+  <div class="screen" id="screen-passcode" data-statusbar-color="#ffffff">
     <div class="pc-wrap">
       <div class="pc-lock-wrap">
         <svg class="pc-lock-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Locked padlock">
@@ -604,7 +604,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-landing (was index.html) ===== -->
-  <div class="screen" id="screen-landing">
+  <div class="screen" id="screen-landing" data-statusbar-color="#eef2f3">
     <div class="image-container">
         <img src="idjameshp.png" alt="">
         <a href="#" class="invisible-button" data-enter="permit"></a>
@@ -612,7 +612,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-permit (was main1.html) ===== -->
-  <div class="screen" id="screen-permit">
+  <div class="screen" id="screen-permit" data-statusbar-color="#ffffff">
     <div class="header">
         <div class="back-arrow" data-back>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -637,7 +637,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-identity (was page2.html) ===== -->
-  <div class="screen" id="screen-identity">
+  <div class="screen" id="screen-identity" data-statusbar-color="#ffffff">
     <div class="header">
         <div class="back-arrow" data-back>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -659,7 +659,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-age (was page3.html) ===== -->
-  <div class="screen" id="screen-age">
+  <div class="screen" id="screen-age" data-statusbar-color="#ffffff">
     <div class="header">
         <div class="back-arrow" data-back>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -681,7 +681,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-verify (was page4.html) ===== -->
-  <div class="screen" id="screen-verify">
+  <div class="screen" id="screen-verify" data-statusbar-color="#ffffff">
     <div class="page-wrapper">
       <div class="header">
         <div class="header-title">Verify Licence</div>
@@ -738,9 +738,15 @@ setTimeout(function () {
     var app = document.getElementById('app');
 
     // Splash screen: image + loader shown for 0.7s before the passcode gate
+   // Splash screen: image + loader shown for 0.7s before the passcode gate
     setTimeout(function () {
         document.getElementById('screen-splash').classList.remove('active');
-        document.getElementById('screen-passcode').classList.add('active');
+        var passcodeScreen = document.getElementById('screen-passcode');
+        passcodeScreen.classList.add('active');
+        document.documentElement.style.setProperty(
+            '--statusbar-color',
+            passcodeScreen.getAttribute('data-statusbar-color') || '#ffffff'
+        );
     }, 1000);
     var verifyTimerInterval = null;
     var segmentedOverlay = document.querySelector('.segmented-overlay');
@@ -942,7 +948,12 @@ function switchScreen(name) {
     var current = app.querySelector('.screen.active');
     var next = document.getElementById('screen-' + name);
     if (!next || next === current) return;
-    
+
+    document.documentElement.style.setProperty(
+        '--statusbar-color',
+        next.getAttribute('data-statusbar-color') || '#ffffff'
+    );
+
     var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
 
     if (current && softSwap) {
