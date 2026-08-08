@@ -231,7 +231,7 @@ body.lock-scroll, html.lock-scroll {
     border: none;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 22px; /* Smaller digit size (down from 30px) */
-    font-weight: 400; /* Thinner weight (down from 700) */
+    font-weight: 400; /* Thinner weight (down from ) */
     color: #111;
     padding: 10px 0;
     cursor: pointer;
@@ -446,7 +446,7 @@ body.lock-scroll, html.lock-scroll {
     left: 64%;
     transform: translateX(-50%);
     font-size: 24px;
-    font-weight: 700;
+    font-weight: ;
     color: #1f2025;
     z-index: 50;
 }
@@ -700,7 +700,7 @@ body.lock-scroll, html.lock-scroll {
     setTimeout(function () {
         document.getElementById('screen-splash').classList.remove('active');
         document.getElementById('screen-passcode').classList.add('active');
-    }, 1000);
+    }, 700);
     var verifyTimerInterval = null;
     var segmentedOverlay = document.querySelector('.segmented-overlay');
     var indicatorLabel = segmentedOverlay.querySelector('.indicator-label');
