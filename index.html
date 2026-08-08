@@ -940,32 +940,49 @@ function showLoaderThen(targetScreenName, callback) {
     }, 500);
 }
 
-    function switchScreen(name) {
-        var current = app.querySelector('.screen.active');
-        var next = document.getElementById('screen-' + name);
-        if (!next || next === current) return;
-        var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
+   // Add 'slideIn' as the second parameter
+function switchScreen(name, slideIn) {
+    var current = app.querySelector('.screen.active');
+    var next = document.getElementById('screen-' + name);
+    if (!next || next === current) return;
+    
+    var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
 
-        if (current && softSwap) {
-            prepareLeavingScreen(current);
-            setTimeout(function () { clearLeavingScreen(current); }, screenFadeDuration + 20);
-        } else if (current) {
-            current.classList.remove('active', 'entering');
-        }
-        if (current && current.id === 'screen-verify') stopVerifyTimer();
+    if (current && softSwap) {
+        prepareLeavingScreen(current);
+        setTimeout(function () { clearLeavingScreen(current); }, screenFadeDuration + 20);
+    } else if (current) {
+        // Clear all possible entering classes
+        current.classList.remove('active', 'entering', 'entering-slide-left');
+    }
+    
+    if (current && current.id === 'screen-verify') stopVerifyTimer();
 
-        if (name === 'landing') resetLanding();
+    if (name === 'landing') resetLanding();
 
+    // Check if we should use the slide animation
+    if (slideIn) {
+        next.classList.add('active', 'entering-slide-left');
+        setTimeout(function () { next.classList.remove('entering-slide-left'); }, 350); // Matches the 0.35s CSS timing
+    } else {
+        // Default fade animation for standard navigation
         next.classList.add('active', 'entering');
         setTimeout(function () { next.classList.remove('entering'); }, screenFadeDuration);
-
-        setLock(name === 'landing' || name === 'verify' || name === 'passcode');
-
-        if (name === 'verify') {
-            replaySlideUp();
-            startVerifyTimer();
-        }
     }
+
+    setLock(name === 'landing' || name === 'verify' || name === 'passcode');
+
+    if (name === 'verify') {
+        replaySlideUp();
+        startVerifyTimer();
+    }
+    
+    // Update the segmented indicator if navigating into a segment screen
+    if (isSegmentTarget(name)) {
+        indicatorTarget = name;
+        updateIndicator(false);
+    }
+}
 
     // ===== Passcode gate logic =====
     (function () {
