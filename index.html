@@ -921,7 +921,7 @@ function showLoaderThen(targetScreenName, callback) {
     var current = app.querySelector('.screen.active');
     var loader = document.getElementById('screen-loader');
     
-    // Instantly hide current screen so it's ready behind the loader
+    // Hide current screen so it's ready behind the loader
     if (current) current.classList.remove('active', 'entering', 'entering-slide-left');
     
     // Show the loader and lock the screen
@@ -933,16 +933,12 @@ function showLoaderThen(targetScreenName, callback) {
         if (callback) {
             callback();
         } else {
-            // THE FIX: If the target is 'home' (or 'passcode'), use normal fade (false).
-            // If it's going ANYWHERE else (like your main pages), trigger the slide (true).
-            var shouldSlide = (targetScreenName !== 'home' && targetScreenName !== 'passcode');
-            
-            switchScreen(targetScreenName, shouldSlide);
+            switchScreen(targetScreenName);
         }
     }, 500);
 }
    // Add 'slideIn' as the second parameter
-function switchScreen(name, slideIn) {
+function switchScreen(name) {
     var current = app.querySelector('.screen.active');
     var next = document.getElementById('screen-' + name);
     if (!next || next === current) return;
@@ -960,15 +956,20 @@ function switchScreen(name, slideIn) {
 
     if (name === 'landing') resetLanding();
 
-    // The Slide Logic
-    if (slideIn) {
+    // ======= EXACT TARGET LOGIC =======
+    // We added 'age' and 'identity' just in case you use those tabs too.
+    // It will NEVER slide on 'landing' or 'passcode' now.
+    var shouldSlide = (name === 'permit' || name === 'verify' || name === 'age' || name === 'identity') && !softSwap;
+
+    if (shouldSlide) {
         next.classList.add('active', 'entering-slide-left');
-        setTimeout(function () { next.classList.remove('entering-slide-left'); }, 600); 
+        setTimeout(function () { next.classList.remove('entering-slide-left'); }, 600); // 600ms to match the CSS
     } else {
-        // Normal Fade Logic
+        // Normal Fade for Landing, Passcode, etc.
         next.classList.add('active', 'entering');
         setTimeout(function () { next.classList.remove('entering'); }, screenFadeDuration);
     }
+    // ==================================
 
     setLock(name === 'landing' || name === 'verify' || name === 'passcode');
 
