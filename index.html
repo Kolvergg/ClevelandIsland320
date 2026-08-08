@@ -127,6 +127,25 @@ body.lock-scroll, html.lock-scroll {
     mask: radial-gradient(farthest-side, transparent 17px, #000 18px);
     animation: spin 0.75s linear infinite;
 }
+#screen-splash {
+    background-color: #F7F9F7;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+.splash-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+}
+.splash-image {
+    width: 120px;
+    height: auto;
+}
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -500,7 +519,15 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-passcode (new front gate, shown first) ===== -->
-  <div class="screen active" id="screen-passcode">
+  <div class="screen active" id="screen-splash">
+    <div class="splash-wrap">
+        <img src="idsplash.png" alt="" class="splash-image">
+        <div class="loader-spinner"></div>
+    </div>
+  </div>
+
+  <!-- ===== screen-passcode (new front gate, now shown after splash) ===== -->
+  <div class="screen" id="screen-passcode">
     <div class="pc-wrap">
       <div class="pc-lock-wrap">
         <svg class="pc-lock-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Locked padlock">
@@ -658,6 +685,12 @@ body.lock-scroll, html.lock-scroll {
 <script>
 (function () {
     var app = document.getElementById('app');
+
+    // Splash screen: image + loader shown for 0.7s before the passcode gate
+    setTimeout(function () {
+        document.getElementById('screen-splash').classList.remove('active');
+        document.getElementById('screen-passcode').classList.add('active');
+    }, 700);
     var verifyTimerInterval = null;
     var segmentedOverlay = document.querySelector('.segmented-overlay');
     var indicatorLabel = segmentedOverlay.querySelector('.indicator-label');
