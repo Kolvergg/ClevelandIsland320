@@ -68,12 +68,14 @@ body {
    segmented control, or invisible tap areas. */
 :root {
     --statusbar-color: #F7F9F7;
-    --statusbar-height: 59px;
+    --statusbar-height: 32px;
+    --statusbar-min-height: 24px;
 }
 .status-bar-fill {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: max(env(safe-area-inset-top), var(--statusbar-height));
+    height: var(--statusbar-height);
+    height: min(max(env(safe-area-inset-top), var(--statusbar-min-height)), var(--statusbar-height));
     background-color: var(--statusbar-color, #FFFFFF);
     z-index: 2147483647;
     pointer-events: none;
