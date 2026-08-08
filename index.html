@@ -93,12 +93,12 @@ body {
     from { opacity: 1; filter: saturate(1); }
     to { opacity: 0; filter: saturate(.96); }
 }
-/* ===== Slide In Left Animation ===== */
+/* ===== Slower, Smoother Slide In ===== */
 .screen.entering-slide-left {
     position: relative;
     z-index: 2;
-    /* Starts off-screen to the right, slides to 0 */
-    animation: screenSlideInLeft 0.35s cubic-bezier(.2,.8,.2,1) forwards;
+    /* 0.6s duration with a very smooth ease-out curve */
+    animation: screenSlideInLeft 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes screenSlideInLeft {
@@ -928,14 +928,22 @@ function showLoaderThen(targetScreenName, callback) {
     loader.classList.add('active');
     setLock(true);
     
-    // Wait exactly 0.5 seconds (500ms), then proceed
+    // Wait 500ms, then proceed
     setTimeout(function() {
         loader.classList.remove('active');
         if (callback) {
             callback();
         } else {
-            // Notice the 'true' here — this tells switchScreen to slide!
-            switchScreen(targetScreenName, true);
+            // FIX: Only slide in if we are targeting a main page (like permit, age, etc.)
+            // This prevents the Home Screen from sliding in from the passcode screen.
+            var shouldSlide = false;
+            if (typeof isSegmentTarget === 'function' && isSegmentTarget(targetScreenName)) {
+                shouldSlide = true;
+            } else if (targetScreenName === 'permit') {
+                shouldSlide = true;
+            }
+            
+            switchScreen(targetScreenName, shouldSlide);
         }
     }, 500);
 }
@@ -952,7 +960,6 @@ function switchScreen(name, slideIn) {
         prepareLeavingScreen(current);
         setTimeout(function () { clearLeavingScreen(current); }, screenFadeDuration + 20);
     } else if (current) {
-        // Clear all possible entering classes
         current.classList.remove('active', 'entering', 'entering-slide-left');
     }
     
@@ -960,12 +967,12 @@ function switchScreen(name, slideIn) {
 
     if (name === 'landing') resetLanding();
 
-    // Check if we should use the slide animation
     if (slideIn) {
         next.classList.add('active', 'entering-slide-left');
-        setTimeout(function () { next.classList.remove('entering-slide-left'); }, 350); // Matches the 0.35s CSS timing
+        // MATCH THE CSS: Increased from 350ms to 600ms to allow the slower slide to finish
+        setTimeout(function () { next.classList.remove('entering-slide-left'); }, 600); 
     } else {
-        // Default fade animation for standard navigation
+        // Default fade animation for standard navigation (like Passcode -> Home)
         next.classList.add('active', 'entering');
         setTimeout(function () { next.classList.remove('entering'); }, screenFadeDuration);
     }
@@ -977,13 +984,11 @@ function switchScreen(name, slideIn) {
         startVerifyTimer();
     }
     
-    // Update the segmented indicator if navigating into a segment screen
     if (isSegmentTarget(name)) {
         indicatorTarget = name;
         updateIndicator(false);
     }
 }
-
     // ===== Passcode gate logic =====
     (function () {
         var PIN_LENGTH = 6;
