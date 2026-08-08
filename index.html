@@ -131,20 +131,30 @@ body.lock-scroll, html.lock-scroll {
     background-color: #F7F9F7;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10001;
+    overflow: hidden;
+}
+#screen-splash.active {
+    display: flex; /* higher specificity than .screen.active so this actually applies */
 }
 .splash-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 28px;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 .splash-image {
-    width: 120px;
-    height: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.splash-wrap .loader-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 @keyframes spin {
     0% { transform: rotate(0deg); }
