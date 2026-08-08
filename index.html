@@ -5,7 +5,8 @@
 <meta charset="UTF-8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#F7F9F7" id="theme-color-meta">
 <!-- Custom Home Screen icon — see note in chat about image requirements
      and the need to re-add to Home Screen once this is uploaded. -->
 <link rel="apple-touch-icon" href="vicroads.png">
@@ -62,14 +63,23 @@ body {
 .screen { display: none; }
 .screen.active { display: block; }
 
-/* Fixed white bar painted over the notch/Dynamic Island area. Sits above
-   everything but is NOT part of page flow, so it can't shift any existing
-   header height or button position. */
+
+/* Fixed colour layer for the iPhone safe-area / Dynamic Island region.
+   It is not part of layout, so it will not move your photos, headers, buttons,
+   segmented control, or invisible tap areas. */
+:root {
+    --statusbar-color: #F7F9F7;
+}
+
+html, body {
+    background-color: var(--statusbar-color);
+}
+
 .status-bar-fill {
     position: fixed;
     top: 0; left: 0; right: 0;
     height: env(safe-area-inset-top);
-    background: var(--statusbar-color, #FFFFFF);
+    background-color: var(--statusbar-color);
     z-index: 9999;
     pointer-events: none;
     transition: background-color 140ms ease;
@@ -730,8 +740,19 @@ preloadImages();
 
 // Your splash timer
 setTimeout(function () {
+    var passcodeScreen = document.getElementById('screen-passcode');
+    var statusColor = passcodeScreen.getAttribute('data-statusbar-color') || '#ffffff';
+
     document.getElementById('screen-splash').classList.remove('active');
-    document.getElementById('screen-passcode').classList.add('active');
+    passcodeScreen.classList.add('active');
+
+    document.documentElement.style.setProperty('--statusbar-color', statusColor);
+    document.body.style.backgroundColor = statusColor;
+
+    var themeColorMeta = document.getElementById('theme-color-meta');
+    if (themeColorMeta) {
+        themeColorMeta.setAttribute('content', statusColor);
+    }
 }, 800);
      
 (function () {
@@ -759,6 +780,21 @@ setTimeout(function () {
         age: 'Age'
     };
     var screenFadeDuration = 280;
+         function setStatusBarColorForScreen(screen) {
+        if (!screen) return;
+
+        var statusColor = screen.getAttribute('data-statusbar-color') || '#ffffff';
+
+        document.documentElement.style.setProperty('--statusbar-color', statusColor);
+        document.body.style.backgroundColor = statusColor;
+
+        var themeColorMeta = document.getElementById('theme-color-meta');
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', statusColor);
+        }
+    }
+
+    setStatusBarColorForScreen(app.querySelector('.screen.active'));
 
     // Generates the timestamp dynamically matching "Last refresh: Wed 29 Jul 2026 9:46pm"
  function getFormattedRefreshTime() {
@@ -949,10 +985,7 @@ function switchScreen(name) {
     var next = document.getElementById('screen-' + name);
     if (!next || next === current) return;
 
-    document.documentElement.style.setProperty(
-        '--statusbar-color',
-        next.getAttribute('data-statusbar-color') || '#ffffff'
-    );
+             setStatusBarColorForScreen(next);
 
     var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
 
