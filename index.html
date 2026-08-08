@@ -69,9 +69,10 @@ body {
     position: fixed;
     top: 0; left: 0; right: 0;
     height: env(safe-area-inset-top);
-    background: #FFFFFF; /* TEMP diagnostic color — will be set back to white */
+    background: var(--statusbar-color, #FFFFFF);
     z-index: 9999;
     pointer-events: none;
+    transition: background-color 140ms ease;
 }
 
 /* Lightweight fade used when switching into permit/identity/age/verify */
@@ -153,7 +154,7 @@ body.lock-scroll, html.lock-scroll {
 .splash-wrap .loader-spinner {
     position: absolute;
     top: 50%;
-    left: 60%;
+    left: 40%;
     transform: translate(-50%, -50%);
 }
 @keyframes spin {
@@ -529,7 +530,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-passcode (new front gate, shown first) ===== -->
-  <div class="screen active" id="screen-splash">
+  <div class="screen active" id="screen-splash" data-statusbar-color="#FFFFFF">
     <div class="splash-wrap">
         <img src="idsplash.png" alt="" class="splash-image">
         <div class="loader-spinner"></div>
