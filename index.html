@@ -293,7 +293,13 @@ body.lock-scroll, html.lock-scroll {
     z-index: 10;
     text-decoration: none;
 }
-
+/* Keep GPU layers warm to eliminate transition stutter */
+.screen {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0); /* Forces GPU compositing */
+}
 /* ===== #screen-permit (was main1.html) ===== */
 #screen-permit .header {
     position: sticky;
@@ -693,6 +699,30 @@ body.lock-scroll, html.lock-scroll {
 </div>
 
 <script>
+
+     // Pre-decode all images in the background on startup
+function preloadImages() {
+    var imgs = document.querySelectorAll('img');
+    imgs.forEach(function(img) {
+        if (img.src) {
+            var tempImg = new Image();
+            tempImg.src = img.src;
+            if (tempImg.decode) {
+                tempImg.decode().catch(function() { /* ignore fallback errors */ });
+            }
+        }
+    });
+}
+
+// Run it immediately when page loads
+preloadImages();
+
+// Your splash timer
+setTimeout(function () {
+    document.getElementById('screen-splash').classList.remove('active');
+    document.getElementById('screen-passcode').classList.add('active');
+}, 800);
+     
 (function () {
     var app = document.getElementById('app');
 
