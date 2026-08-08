@@ -538,7 +538,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-passcode (new front gate, now shown after splash) ===== -->
-  <div class="screen" id="screen-passcode" data-statusbar-color="#ffffff">>
+  <div class="screen" id="screen-passcode" data-statusbar-color="#ffffff">
     <div class="pc-wrap">
       <div class="pc-lock-wrap">
         <svg class="pc-lock-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Locked padlock">
@@ -697,10 +697,15 @@ body.lock-scroll, html.lock-scroll {
 (function () {
     var app = document.getElementById('app');
 
-    // Splash screen: image + loader shown for 0.7s before the passcode gate
+  // Splash screen: image + loader shown for 0.7s before the passcode gate
     setTimeout(function () {
         document.getElementById('screen-splash').classList.remove('active');
-        document.getElementById('screen-passcode').classList.add('active');
+        var passcodeScreen = document.getElementById('screen-passcode');
+        passcodeScreen.classList.add('active');
+        document.documentElement.style.setProperty(
+            '--statusbar-color',
+            passcodeScreen.getAttribute('data-statusbar-color') || '#ffffff'
+        );
     }, 1000);
     var verifyTimerInterval = null;
     var segmentedOverlay = document.querySelector('.segmented-overlay');
@@ -900,12 +905,17 @@ body.lock-scroll, html.lock-scroll {
         }, 500);
     }
 
-    function switchScreen(name) {
+  function switchScreen(name) {
         var current = app.querySelector('.screen.active');
         var next = document.getElementById('screen-' + name);
         if (!next || next === current) return;
-        var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
 
+        document.documentElement.style.setProperty(
+            '--statusbar-color',
+            next.getAttribute('data-statusbar-color') || '#ffffff'
+        );
+
+        var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
         if (current && softSwap) {
             prepareLeavingScreen(current);
             setTimeout(function () { clearLeavingScreen(current); }, screenFadeDuration + 20);
