@@ -5,11 +5,10 @@
 <meta charset="UTF-8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#F7F9F7" id="theme-color-meta">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!-- Custom Home Screen icon — see note in chat about image requirements
      and the need to re-add to Home Screen once this is uploaded. -->
-<link rel="apple-touch-icon" href="">
+<link rel="apple-touch-icon" href="vicroads.png">
 <title>View details</title>
 <style>
 
@@ -63,24 +62,18 @@ body {
 .screen { display: none; }
 .screen.active { display: block; }
 
-/* Fixed colour layer for the iPhone safe-area / Dynamic Island region.
-   It is not part of layout, so it will not move your photos, headers, buttons,
-   segmented control, or invisible tap areas. */
-:root {
-    --statusbar-color: #F7F9F7;
-    --statusbar-height: 59px;
-}
+/* Fixed white bar painted over the notch/Dynamic Island area. Sits above
+   everything but is NOT part of page flow, so it can't shift any existing
+   header height or button position. */
 .status-bar-fill {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: max(env(safe-area-inset-top), var(--statusbar-height));
-    background-color: var(--statusbar-color, #FFFFFF);
-    z-index: 2147483647;
+    height: env(safe-area-inset-top);
+    background: #FFFFFF; /* TEMP diagnostic color — will be set back to white */
+    z-index: 9999;
     pointer-events: none;
-    transition: background-color 140ms ease;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
 }
+
 /* Lightweight fade used when switching into permit/identity/age/verify */
 .screen.entering {
     position: relative;
@@ -100,18 +93,7 @@ body {
     from { opacity: 1; filter: saturate(1); }
     to { opacity: 0; filter: saturate(.96); }
 }
-/* ===== Slower, Smoother Slide In ===== */
-.screen.entering-slide-left {
-    position: relative;
-    z-index: 2;
-    /* 0.6s duration with a very smooth ease-out curve */
-    animation: screenSlideInLeft 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
 
-@keyframes screenSlideInLeft {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
-}
 /* Locks scroll while the landing screen OR the verify screen is active */
 body.lock-scroll, html.lock-scroll {
     overflow: hidden;
@@ -144,35 +126,6 @@ body.lock-scroll, html.lock-scroll {
     -webkit-mask: radial-gradient(farthest-side, transparent 17px, #000 18px);
     mask: radial-gradient(farthest-side, transparent 17px, #000 18px);
     animation: spin 0.75s linear infinite;
-}
-#screen-splash {
-    background-color: #F7F9F7;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    align-items: center;
-    justify-content: center;
-    z-index: 10001;
-    overflow: hidden;
-}
-#screen-splash.active {
-    display: flex; /* higher specificity than .screen.active so this actually applies */
-}
-.splash-wrap {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-.splash-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-.splash-wrap .loader-spinner {
-    position: absolute;
-    top: 50%;
-    left: 46%;
-    transform: translate(-50%, -50%);
 }
 @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -249,7 +202,7 @@ body.lock-scroll, html.lock-scroll {
     border: none;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 22px; /* Smaller digit size (down from 30px) */
-    font-weight: 400; /* Thinner weight (down from ) */
+    font-weight: 400; /* Thinner weight (down from 700) */
     color: #111;
     padding: 10px 0;
     cursor: pointer;
@@ -311,13 +264,7 @@ body.lock-scroll, html.lock-scroll {
     z-index: 10;
     text-decoration: none;
 }
-/* Keep GPU layers warm to eliminate transition stutter */
-.screen {
-    will-change: transform, opacity;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform: translateZ(0); /* Forces GPU compositing */
-}
+
 /* ===== #screen-permit (was main1.html) ===== */
 #screen-permit .header {
     position: sticky;
@@ -470,7 +417,7 @@ body.lock-scroll, html.lock-scroll {
     left: 64%;
     transform: translateX(-50%);
     font-size: 24px;
-    font-weight: bold;
+    font-weight: 700;
     color: #1f2025;
     z-index: 50;
 }
@@ -553,15 +500,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-passcode (new front gate, shown first) ===== -->
-  <div class="screen active" id="screen-splash" data-statusbar-color="#F7F9F7">
-    <div class="splash-wrap">
-        <img src="idsplash.png" alt="" class="splash-image">
-        <div class="loader-spinner"></div>
-    </div>
-  </div>
-
-  <!-- ===== screen-passcode (new front gate, now shown after splash) ===== -->
-  <div class="screen" id="screen-passcode" data-statusbar-color="#ffffff">
+  <div class="screen active" id="screen-passcode">
     <div class="pc-wrap">
       <div class="pc-lock-wrap">
         <svg class="pc-lock-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Locked padlock">
@@ -611,7 +550,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-landing (was index.html) ===== -->
-  <div class="screen" id="screen-landing" data-statusbar-color="#eef2f3">
+  <div class="screen" id="screen-landing">
     <div class="image-container">
         <img src="idjameshp.png" alt="">
         <a href="#" class="invisible-button" data-enter="permit"></a>
@@ -619,7 +558,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-permit (was main1.html) ===== -->
-  <div class="screen" id="screen-permit" data-statusbar-color="#ffffff">
+  <div class="screen" id="screen-permit">
     <div class="header">
         <div class="back-arrow" data-back>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -631,20 +570,20 @@ body.lock-scroll, html.lock-scroll {
     <div class="refresh-bar" data-refresh-time>Last refreshed: Wed 29 Jul 2026 9:46pm</div>
     <div class="content">
         <div class="image-container">
-            <img src="identity1.jpg" alt="">
+            <img src="identityuno.jpg" alt="">
             <a href="#" class="invisible-button btn-permit"   data-target="permit"></a>
             <a href="#" class="invisible-button btn-identity" data-target="identity"></a>
             <a href="#" class="invisible-button btn-age"      data-target="age"></a>
             <a href="#" class="invisible-button btn-new"      data-target="verify"></a>
         </div>
         <div class="image-container">
-            <img src="idlucaa.png" alt="">
+            <img src="idlucaaa.png" alt="">
         </div>
     </div>
   </div>
 
   <!-- ===== screen-identity (was page2.html) ===== -->
-  <div class="screen" id="screen-identity" data-statusbar-color="#ffffff">
+  <div class="screen" id="screen-identity">
     <div class="header">
         <div class="back-arrow" data-back>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -666,7 +605,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-age (was page3.html) ===== -->
-  <div class="screen" id="screen-age" data-statusbar-color="#ffffff">
+  <div class="screen" id="screen-age">
     <div class="header">
         <div class="back-arrow" data-back>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -688,7 +627,7 @@ body.lock-scroll, html.lock-scroll {
   </div>
 
   <!-- ===== screen-verify (was page4.html) ===== -->
-  <div class="screen" id="screen-verify" data-statusbar-color="#ffffff">
+  <div class="screen" id="screen-verify">
     <div class="page-wrapper">
       <div class="header">
         <div class="header-title">Verify Licence</div>
@@ -717,50 +656,8 @@ body.lock-scroll, html.lock-scroll {
 </div>
 
 <script>
-
-     // Pre-decode all images in the background on startup
-function preloadImages() {
-    var imgs = document.querySelectorAll('img');
-    imgs.forEach(function(img) {
-        if (img.src) {
-            var tempImg = new Image();
-            tempImg.src = img.src;
-            if (tempImg.decode) {
-                tempImg.decode().catch(function() { /* ignore fallback errors */ });
-            }
-        }
-    });
-}
-
-// Run it immediately when page loads
-preloadImages();
-
-// Your splash timer
-setTimeout(function () {
-    var passcodeScreen = document.getElementById('screen-passcode');
-    var statusColor = passcodeScreen.getAttribute('data-statusbar-color') || '#ffffff';
-    var statusFill = document.querySelector('.status-bar-fill');
-    var themeColorMeta = document.getElementById('theme-color-meta');
-
-    document.documentElement.style.setProperty('--statusbar-color', statusColor);
-    if (statusFill) statusFill.style.backgroundColor = statusColor;
-    if (themeColorMeta) themeColorMeta.setAttribute('content', statusColor);
-
-    document.getElementById('screen-splash').classList.remove('active');
-    passcodeScreen.classList.add('active');
-}, 800);
-     
 (function () {
     var app = document.getElementById('app');
-
-    // Splash screen: image + loader shown for 0.7s before the passcode gate
-   // Splash screen: image + loader shown for 0.7s before the passcode gate
-    setTimeout(function () {
-        document.getElementById('screen-splash').classList.remove('active');
-        var passcodeScreen = document.getElementById('screen-passcode');
-        passcodeScreen.classList.add('active');
-        setStatusBarColorForScreen(passcodeScreen);
-    }, 1000);
     var verifyTimerInterval = null;
     var segmentedOverlay = document.querySelector('.segmented-overlay');
     var indicatorLabel = segmentedOverlay.querySelector('.indicator-label');
@@ -772,27 +669,6 @@ setTimeout(function () {
         age: 'Age'
     };
     var screenFadeDuration = 280;
-
-    function setStatusBarColor(statusColor) {
-        document.documentElement.style.setProperty('--statusbar-color', statusColor);
-
-        var statusFill = document.querySelector('.status-bar-fill');
-        if (statusFill) {
-            statusFill.style.backgroundColor = statusColor;
-        }
-
-        var themeColorMeta = document.getElementById('theme-color-meta');
-        if (themeColorMeta) {
-            themeColorMeta.setAttribute('content', statusColor);
-        }
-    }
-
-    function setStatusBarColorForScreen(screen) {
-        if (!screen) return;
-        setStatusBarColor(screen.getAttribute('data-statusbar-color') || '#ffffff');
-    }
-
-    setStatusBarColorForScreen(app.querySelector('.screen.active'));
 
     // Generates the timestamp dynamically matching "Last refresh: Wed 29 Jul 2026 9:46pm"
  function getFormattedRefreshTime() {
@@ -957,75 +833,56 @@ setTimeout(function () {
         screen.style.width = '';
         screen.style.zIndex = '';
     }
-function showLoaderThen(targetScreenName, callback) {
-    var current = app.querySelector('.screen.active');
-    var loader = document.getElementById('screen-loader');
-    
-    // Hide current screen so it's ready behind the loader
-    if (current) current.classList.remove('active', 'entering', 'entering-slide-left');
-    
-    // Show the loader and lock the screen
-    setStatusBarColor('#F7F9F7');
-    loader.classList.add('active');
-    setLock(true);
-    
-    setTimeout(function() {
-        loader.classList.remove('active');
-        if (callback) {
-            callback();
-        } else {
-            switchScreen(targetScreenName);
-        }
-    }, 500);
-}
-   // Add 'slideIn' as the second parameter
-function switchScreen(name) {
-    var current = app.querySelector('.screen.active');
-    var next = document.getElementById('screen-' + name);
-    if (!next || next === current) return;
 
-    setStatusBarColorForScreen(next);
-
-    var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
-
-    if (current && softSwap) {
-        prepareLeavingScreen(current);
-        setTimeout(function () { clearLeavingScreen(current); }, screenFadeDuration + 20);
-    } else if (current) {
-        current.classList.remove('active', 'entering', 'entering-slide-left');
+    function showLoaderThen(targetScreenName, callback) {
+        var current = app.querySelector('.screen.active');
+        var loader = document.getElementById('screen-loader');
+        
+        // Instantly hide current screen
+        if (current) current.classList.remove('active', 'entering');
+        
+        // Show the loader and lock the screen
+        loader.classList.add('active');
+        setLock(true);
+        
+        // Wait exactly 0.5 seconds (500ms), then proceed
+        setTimeout(function() {
+            loader.classList.remove('active');
+            if (callback) {
+                callback();
+            } else {
+                switchScreen(targetScreenName);
+            }
+        }, 500);
     }
-    
-    if (current && current.id === 'screen-verify') stopVerifyTimer();
 
-    if (name === 'landing') resetLanding();
+    function switchScreen(name) {
+        var current = app.querySelector('.screen.active');
+        var next = document.getElementById('screen-' + name);
+        if (!next || next === current) return;
+        var softSwap = isSegmentTarget(name) && isSegmentScreen(current);
 
-    // ======= EXACT TARGET LOGIC =======
-    // We added 'age' and 'identity' just in case you use those tabs too.
-    // It will NEVER slide on 'landing' or 'passcode' now.
-    var shouldSlide = (name === 'permit' || name === 'verify' || name === 'age' || name === 'identity') && !softSwap;
+        if (current && softSwap) {
+            prepareLeavingScreen(current);
+            setTimeout(function () { clearLeavingScreen(current); }, screenFadeDuration + 20);
+        } else if (current) {
+            current.classList.remove('active', 'entering');
+        }
+        if (current && current.id === 'screen-verify') stopVerifyTimer();
 
-    if (shouldSlide) {
-        next.classList.add('active', 'entering-slide-left');
-        setTimeout(function () { next.classList.remove('entering-slide-left'); }, 600); // 600ms to match the CSS
-    } else {
-        // Normal Fade for Landing, Passcode, etc.
+        if (name === 'landing') resetLanding();
+
         next.classList.add('active', 'entering');
         setTimeout(function () { next.classList.remove('entering'); }, screenFadeDuration);
-    }
-    // ==================================
 
-    setLock(name === 'landing' || name === 'verify' || name === 'passcode');
+        setLock(name === 'landing' || name === 'verify' || name === 'passcode');
 
-    if (name === 'verify') {
-        replaySlideUp();
-        startVerifyTimer();
+        if (name === 'verify') {
+            replaySlideUp();
+            startVerifyTimer();
+        }
     }
-    
-    if (isSegmentTarget(name)) {
-        indicatorTarget = name;
-        updateIndicator(false);
-    }
-}
+
     // ===== Passcode gate logic =====
     (function () {
         var PIN_LENGTH = 6;
