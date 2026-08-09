@@ -1056,7 +1056,7 @@ function switchScreen(name) {
                 updateIndicator(false);
             }
 
-            if (window.scrollY > 120) {
+          if (window.scrollY > 0) {
                 window.scrollTo({
                     top: 0,
                     behavior: 'smooth'
@@ -1074,7 +1074,15 @@ app.querySelectorAll('[data-close]').forEach(function (btn) {
         var verifyScreen = document.getElementById('screen-verify');
         var wrapper = verifyScreen.querySelector('.page-wrapper');
 
+        // Freeze it at its current visible position (translateY(0)) first,
+        // so removing 'slide-up' next doesn't cause it to instantly snap
+        // back to the base CSS rule's translateY(100%).
+        wrapper.style.transition = 'none';
+        wrapper.style.transform = 'translateY(0)';
         wrapper.classList.remove('slide-up');
+        void wrapper.offsetWidth; // force reflow so the above actually applies first
+
+        // Now animate it down for real
         wrapper.style.transition = 'transform 0.35s cubic-bezier(.2,.8,.2,1)';
         wrapper.style.transform = 'translateY(100%)';
 
