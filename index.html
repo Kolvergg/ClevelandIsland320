@@ -825,11 +825,11 @@ setTimeout(function () {
 
     // Re-triggers the slide-up entrance every time the verify screen
     // becomes active.
-    function replaySlideUp() {
+   function replaySlideUp() {
         var wrapper = document.querySelector('#screen-verify .page-wrapper');
-        wrapper.classList.remove('slide-up');
-        wrapper.style.transform = 'translateY(100%)';
-        void wrapper.offsetWidth; // force reflow so the animation can restart
+        wrapper.removeAttribute('style'); // clear any leftover inline transform/transition
+        wrapper.classList.remove('slide-up', 'slide-down');
+        void wrapper.offsetWidth;
         wrapper.classList.add('slide-up');
     }
 
@@ -1075,6 +1075,7 @@ function switchScreen(name) {
 app.querySelectorAll('[data-close]').forEach(function (btn) {
     btn.addEventListener('click', function () {
         var wrapper = document.querySelector('#screen-verify .page-wrapper');
+        wrapper.removeAttribute('style'); // same safety clear
         wrapper.classList.remove('slide-up');
         wrapper.classList.add('slide-down');
 
@@ -1083,7 +1084,7 @@ app.querySelectorAll('[data-close]').forEach(function (btn) {
             indicatorTarget = 'permit';
             switchScreen('permit');
             updateIndicator(false);
-        }, 450); // matches the 0.45s animation above
+        }, 450);
     });
 });
 // Watch for scrolling to toggle the header shadow
