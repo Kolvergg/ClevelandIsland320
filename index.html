@@ -1085,26 +1085,28 @@ app.querySelectorAll('[data-back]').forEach(function (btn) {
 
 app.querySelectorAll('[data-close]').forEach(function (btn) {
     btn.addEventListener('click', function () {
-        var wrapper = document.querySelector('#screen-verify .page-wrapper');
+        var verifyScreen = document.getElementById('screen-verify');
+        var wrapper = verifyScreen.querySelector('.page-wrapper');
+
         wrapper.removeAttribute('style');
         wrapper.classList.remove('slide-up');
-        void wrapper.offsetWidth; // force reflow so slide-down restarts cleanly, same as replaySlideUp() does
+        void wrapper.offsetWidth;
+
+        // Mirror the entrance exactly: verify fades out WHILE its content
+        // slides down, at the same time and duration as the entrance fade.
+        verifyScreen.classList.add('leaving');
         wrapper.classList.add('slide-down');
 
         setTimeout(function () {
             wrapper.classList.remove('slide-down');
-
-            var verifyScreen = document.getElementById('screen-verify');
-            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left');
+            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left', 'leaving');
             stopVerifyTimer();
             setLock(false);
 
-            // Fade permit back in directly — bypassing switchScreen() here
-            // on purpose, since switchScreen would trigger permit's normal
-            // slide-right-in animation, which we don't want after closing verify.
+            // Instant reveal, no fade — mirrors how the previous screen
+            // disappeared instantly right before verify slid up on entry.
             var permitScreen = document.getElementById('screen-permit');
-            permitScreen.classList.add('active', 'entering');
-            setTimeout(function () { permitScreen.classList.remove('entering'); }, screenFadeDuration);
+            permitScreen.classList.add('active');
 
             indicatorTarget = 'permit';
             updateIndicator(false);
