@@ -426,11 +426,16 @@ body.lock-scroll, html.lock-scroll {
 #screen-identity .btn-age,      #screen-age .btn-age      { left: 66%;  top: 48%; width: 28%; height: 4.6%; }
 #screen-identity .btn-new,      #screen-age .btn-new      { left: 58.5%; top: 33.5%; width: 30%; height: 4.5%; }
 
-/* ===== #screen-verify (was page4.html) ===== */
 #screen-verify .page-wrapper {
     width: 100%;
     height: 100%;
     transform: translateY(100%);
+}
+#screen-verify .page-wrapper.slide-up {
+    animation: slideUp 0.45s ease forwards;
+}
+@keyframes slideUp {
+    to { transform: translateY(0); }
 }
 #screen-verify .page-wrapper.slide-down {
     animation: slideDown 0.45s ease forwards;
@@ -1058,8 +1063,7 @@ function switchScreen(name) {
                 switchScreen(target);
                 updateIndicator(false);
             }
-
-          if (window.scrollY > 0) {
+if (window.scrollY > 0) {
                 window.scrollTo({
                     top: 0,
                     behavior: 'smooth'
@@ -1071,6 +1075,13 @@ function switchScreen(name) {
             }
         });
     });
+
+app.querySelectorAll('[data-back]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        switchScreen('landing');
+        updateIndicator(true);
+    });
+});
 
 app.querySelectorAll('[data-close]').forEach(function (btn) {
     btn.addEventListener('click', function () {
