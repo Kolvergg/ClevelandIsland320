@@ -1086,14 +1086,27 @@ app.querySelectorAll('[data-back]').forEach(function (btn) {
 app.querySelectorAll('[data-close]').forEach(function (btn) {
     btn.addEventListener('click', function () {
         var wrapper = document.querySelector('#screen-verify .page-wrapper');
-        wrapper.removeAttribute('style'); // same safety clear
+        wrapper.removeAttribute('style');
         wrapper.classList.remove('slide-up');
+        void wrapper.offsetWidth; // force reflow so slide-down restarts cleanly, same as replaySlideUp() does
         wrapper.classList.add('slide-down');
 
         setTimeout(function () {
             wrapper.classList.remove('slide-down');
+
+            var verifyScreen = document.getElementById('screen-verify');
+            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left');
+            stopVerifyTimer();
+            setLock(false);
+
+            // Fade permit back in directly — bypassing switchScreen() here
+            // on purpose, since switchScreen would trigger permit's normal
+            // slide-right-in animation, which we don't want after closing verify.
+            var permitScreen = document.getElementById('screen-permit');
+            permitScreen.classList.add('active', 'entering');
+            setTimeout(function () { permitScreen.classList.remove('entering'); }, screenFadeDuration);
+
             indicatorTarget = 'permit';
-            switchScreen('permit');
             updateIndicator(false);
         }, 450);
     });
