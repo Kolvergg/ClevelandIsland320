@@ -737,11 +737,6 @@ setTimeout(function () {
 (function () {
     var app = document.getElementById('app');
 
-    // Splash screen: image + loader shown for 0.7s before the passcode gate
-    setTimeout(function () {
-        document.getElementById('screen-splash').classList.remove('active');
-        document.getElementById('screen-passcode').classList.add('active');
-    }, 1000);
     var verifyTimerInterval = null;
     var segmentedOverlay = document.querySelector('.segmented-overlay');
     var indicatorLabel = segmentedOverlay.querySelector('.indicator-label');
