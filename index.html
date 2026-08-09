@@ -1091,22 +1091,15 @@ app.querySelectorAll('[data-close]').forEach(function (btn) {
         wrapper.removeAttribute('style');
         wrapper.classList.remove('slide-up');
         void wrapper.offsetWidth;
-
-        // Mirror the entrance exactly: verify fades out WHILE its content
-        // slides down, at the same time and duration as the entrance fade.
-        verifyScreen.classList.add('leaving');
         wrapper.classList.add('slide-down');
 
         setTimeout(function () {
             wrapper.classList.remove('slide-down');
-            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left', 'leaving');
+            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left');
             stopVerifyTimer();
             setLock(false);
 
-            // Instant reveal, no fade — mirrors how the previous screen
-            // disappeared instantly right before verify slid up on entry.
-            var permitScreen = document.getElementById('screen-permit');
-            permitScreen.classList.add('active');
+            document.getElementById('screen-permit').classList.add('active');
 
             indicatorTarget = 'permit';
             updateIndicator(false);
