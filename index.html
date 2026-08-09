@@ -432,10 +432,13 @@ body.lock-scroll, html.lock-scroll {
     height: 100%;
     transform: translateY(100%);
 }
-#screen-verify .page-wrapper.slide-up {
-    animation: slideUp 0.45s ease forwards;
+#screen-verify .page-wrapper.slide-down {
+    animation: slideDown 0.45s ease forwards;
 }
-@keyframes slideUp { to { transform: translateY(0); } }
+@keyframes slideDown {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+}
 #screen-verify .header {
     width: 100%;
     background: white;
@@ -1071,35 +1074,16 @@ function switchScreen(name) {
 
 app.querySelectorAll('[data-close]').forEach(function (btn) {
     btn.addEventListener('click', function () {
-        var verifyScreen = document.getElementById('screen-verify');
-        var wrapper = verifyScreen.querySelector('.page-wrapper');
-
-        // Freeze it at its current visible position (translateY(0)) first,
-        // so removing 'slide-up' next doesn't cause it to instantly snap
-        // back to the base CSS rule's translateY(100%).
-        wrapper.style.transition = 'none';
-        wrapper.style.transform = 'translateY(0)';
+        var wrapper = document.querySelector('#screen-verify .page-wrapper');
         wrapper.classList.remove('slide-up');
-        void wrapper.offsetWidth; // force reflow so the above actually applies first
-
-        // Now animate it down for real
-        wrapper.style.transition = 'transform 0.35s cubic-bezier(.2,.8,.2,1)';
-        wrapper.style.transform = 'translateY(100%)';
+        wrapper.classList.add('slide-down');
 
         setTimeout(function () {
-            wrapper.style.transition = '';
-            wrapper.style.transform = '';
-            stopVerifyTimer();
-            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left');
-            setLock(false);
-
-            var permitScreen = document.getElementById('screen-permit');
-            permitScreen.classList.add('active', 'entering');
-            setTimeout(function () { permitScreen.classList.remove('entering'); }, screenFadeDuration);
-
+            wrapper.classList.remove('slide-down');
             indicatorTarget = 'permit';
+            switchScreen('permit');
             updateIndicator(false);
-        }, 350);
+        }, 450); // matches the 0.45s animation above
     });
 });
 // Watch for scrolling to toggle the header shadow
