@@ -1069,30 +1069,31 @@ function switchScreen(name) {
         });
     });
 
-  app.querySelectorAll('[data-close]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var wrapper = document.querySelector('#screen-verify .page-wrapper');
-            wrapper.classList.remove('slide-up');
-            wrapper.style.transition = 'transform 0.35s cubic-bezier(.2,.8,.2,1)';
-            wrapper.style.transform = 'translateY(100%)';
+app.querySelectorAll('[data-close]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var verifyScreen = document.getElementById('screen-verify');
+        var wrapper = verifyScreen.querySelector('.page-wrapper');
 
-            setTimeout(function () {
-                wrapper.style.transition = '';
-                wrapper.style.transform = '';
-                indicatorTarget = 'permit';
-                switchScreen('permit');
-                updateIndicator(false);
-            }, 350);
-        });
-    });
+        wrapper.classList.remove('slide-up');
+        wrapper.style.transition = 'transform 0.35s cubic-bezier(.2,.8,.2,1)';
+        wrapper.style.transform = 'translateY(100%)';
 
-    app.querySelectorAll('[data-close]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        setTimeout(function () {
+            wrapper.style.transition = '';
+            wrapper.style.transform = '';
+            stopVerifyTimer();
+            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left');
+            setLock(false);
+
+            var permitScreen = document.getElementById('screen-permit');
+            permitScreen.classList.add('active', 'entering');
+            setTimeout(function () { permitScreen.classList.remove('entering'); }, screenFadeDuration);
+
             indicatorTarget = 'permit';
-            switchScreen('permit');
             updateIndicator(false);
-        });
+        }, 350);
     });
+});
 // Watch for scrolling to toggle the header shadow
     window.addEventListener('scroll', function () {
         var headers = document.querySelectorAll('.header');
