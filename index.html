@@ -13,7 +13,47 @@
 <style>
 
     @font-face {
-    font-family: "SatoshiBold";
+    font-family: "SatoshiBold";app.querySelectorAll('[data-close]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var verifyScreen = document.getElementById('screen-verify');
+        var permitScreen = document.getElementById('screen-permit');
+
+        // Reveal permit right now, underneath — it needs to already be
+        // visible so it shows through as verify physically slides off it.
+        permitScreen.classList.add('active');
+        indicatorTarget = 'permit';
+        updateIndicator(true);
+
+        // Pin verify as one solid full-screen layer on top of permit, so
+        // the transform moves the ENTIRE screen — header, QR, timer, all
+        // of it — as a single slab, not just the inner content.
+        verifyScreen.style.position = 'fixed';
+        verifyScreen.style.top = '0';
+        verifyScreen.style.left = '0';
+        verifyScreen.style.width = '100%';
+        verifyScreen.style.height = '100%';
+        verifyScreen.style.zIndex = '500';
+        verifyScreen.style.transition = 'none';
+        verifyScreen.style.transform = 'translateY(0)';
+        void verifyScreen.offsetWidth; // force reflow before animating
+
+        verifyScreen.style.transition = 'transform 0.45s cubic-bezier(.2,.8,.2,1)';
+        verifyScreen.style.transform = 'translateY(100%)';
+
+        setTimeout(function () {
+            stopVerifyTimer();
+            setLock(false);
+
+            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left');
+            verifyScreen.removeAttribute('style');
+
+            var wrapper = verifyScreen.querySelector('.page-wrapper');
+            wrapper.removeAttribute('style');
+            // leave 'slide-up' class on the wrapper as-is, so it's already
+            // in its resting visible position next time verify opens
+        }, 450);
+    });
+});
     src: url("./Satoshi-Bold.otf") format("opentype");
 
          @font-face {
@@ -1086,23 +1126,41 @@ app.querySelectorAll('[data-back]').forEach(function (btn) {
 app.querySelectorAll('[data-close]').forEach(function (btn) {
     btn.addEventListener('click', function () {
         var verifyScreen = document.getElementById('screen-verify');
-        var wrapper = verifyScreen.querySelector('.page-wrapper');
+        var permitScreen = document.getElementById('screen-permit');
 
-        wrapper.removeAttribute('style');
-        wrapper.classList.remove('slide-up');
-        void wrapper.offsetWidth;
-        wrapper.classList.add('slide-down');
+        // Reveal permit right now, underneath — it needs to already be
+        // visible so it shows through as verify physically slides off it.
+        permitScreen.classList.add('active');
+        indicatorTarget = 'permit';
+        updateIndicator(true);
+
+        // Pin verify as one solid full-screen layer on top of permit, so
+        // the transform moves the ENTIRE screen — header, QR, timer, all
+        // of it — as a single slab, not just the inner content.
+        verifyScreen.style.position = 'fixed';
+        verifyScreen.style.top = '0';
+        verifyScreen.style.left = '0';
+        verifyScreen.style.width = '100%';
+        verifyScreen.style.height = '100%';
+        verifyScreen.style.zIndex = '500';
+        verifyScreen.style.transition = 'none';
+        verifyScreen.style.transform = 'translateY(0)';
+        void verifyScreen.offsetWidth; // force reflow before animating
+
+        verifyScreen.style.transition = 'transform 0.45s cubic-bezier(.2,.8,.2,1)';
+        verifyScreen.style.transform = 'translateY(100%)';
 
         setTimeout(function () {
-            wrapper.classList.remove('slide-down');
-            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left');
             stopVerifyTimer();
             setLock(false);
 
-            document.getElementById('screen-permit').classList.add('active');
+            verifyScreen.classList.remove('active', 'entering', 'entering-slide-left');
+            verifyScreen.removeAttribute('style');
 
-            indicatorTarget = 'permit';
-            updateIndicator(false);
+            var wrapper = verifyScreen.querySelector('.page-wrapper');
+            wrapper.removeAttribute('style');
+            // leave 'slide-up' class on the wrapper as-is, so it's already
+            // in its resting visible position next time verify opens
         }, 450);
     });
 });
