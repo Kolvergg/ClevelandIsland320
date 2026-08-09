@@ -954,7 +954,7 @@ function switchScreen(name) {
     // ======= EXACT TARGET LOGIC =======
     // We added 'age' and 'identity' just in case you use those tabs too.
     // It will NEVER slide on 'landing' or 'passcode' now.
-    var shouldSlide = (name === 'permit' || name === 'verify' || name === 'age' || name === 'identity') && !softSwap;
+   var shouldSlide = (name === 'permit' || name === 'age' || name === 'identity') && !softSwap;
 
     if (shouldSlide) {
         next.classList.add('active', 'entering-slide-left');
@@ -1069,10 +1069,20 @@ function switchScreen(name) {
         });
     });
 
-    app.querySelectorAll('[data-back]').forEach(function (btn) {
+  app.querySelectorAll('[data-close]').forEach(function (btn) {
         btn.addEventListener('click', function () {
-            switchScreen('landing');
-            updateIndicator(true);
+            var wrapper = document.querySelector('#screen-verify .page-wrapper');
+            wrapper.classList.remove('slide-up');
+            wrapper.style.transition = 'transform 0.35s cubic-bezier(.2,.8,.2,1)';
+            wrapper.style.transform = 'translateY(100%)';
+
+            setTimeout(function () {
+                wrapper.style.transition = '';
+                wrapper.style.transform = '';
+                indicatorTarget = 'permit';
+                switchScreen('permit');
+                updateIndicator(false);
+            }, 350);
         });
     });
 
